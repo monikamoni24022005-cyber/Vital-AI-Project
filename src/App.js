@@ -1,0 +1,443 @@
+import React, { useState } from "react";
+
+function App() {
+  const [darkMode, setDarkMode] = useState(true);
+
+  const [formData, setFormData] = useState({
+    bp: "",
+    sugar: "",
+    heartRate: "",
+    oxygen: "",
+    temperature: "",
+    weight: "",
+    age: "",
+    hydration: "",
+    sweat: "",
+    symptoms: ""
+  });
+
+  const [result, setResult] = useState(null);
+  const [history, setHistory] = useState([]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const calculateHealthScore = () => {
+    let score = 100;
+
+    if (parseInt(formData.bp) > 140) score -= 15;
+    if (parseInt(formData.sugar) > 180) score -= 15;
+    if (parseInt(formData.heartRate) > 120) score -= 10;
+    if (parseInt(formData.oxygen) < 92) score -= 20;
+    if (parseFloat(formData.temperature) > 100) score -= 10;
+    if (parseInt(formData.hydration) < 40) score -= 10;
+
+    return score < 0 ? 0 : score;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const bp = parseInt(formData.bp) || 0;
+    const sugar = parseInt(formData.sugar) || 0;
+    const heartRate = parseInt(formData.heartRate) || 0;
+    const oxygen = parseInt(formData.oxygen) || 0;
+    const temp = parseFloat(formData.temperature) || 0;
+    const hydration = parseInt(formData.hydration) || 0;
+
+    let diseases = [];
+    let warnings = [];
+    let recommendations = [];
+    let risk = "Low";
+
+    const symptoms = formData.symptoms.toLowerCase();
+
+    if (bp >= 140) {
+      diseases.push("Hypertension");
+      warnings.push("High Blood Pressure");
+      recommendations.push("Reduce salt intake");
+      risk = "Moderate";
+    }
+
+    if (sugar >= 180) {
+      diseases.push("Diabetes Risk");
+      warnings.push("High Sugar Level");
+      recommendations.push("Avoid sugary foods");
+      risk = "High";
+    }
+
+    if (heartRate > 120 || heartRate < 50) {
+      diseases.push("Heart Disease Risk");
+      warnings.push("Abnormal Heart Rate");
+      recommendations.push("Consult Cardiologist");
+    }
+
+    if (oxygen < 92) {
+      diseases.push("Low Oxygen Risk");
+      warnings.push("Critical Oxygen Level");
+      recommendations.push("Immediate medical attention");
+      risk = "Critical";
+    }
+
+    if (temp >= 100) {
+      diseases.push("Fever");
+      recommendations.push("Take rest and fluids");
+    }
+
+    if (
+      symptoms.includes("cough") ||
+      symptoms.includes("breathing")
+    ) {
+      diseases.push("Respiratory Disease");
+    }
+
+    if (
+      symptoms.includes("cold") ||
+      symptoms.includes("sneezing")
+    ) {
+      diseases.push("Cold");
+    }
+
+    if (
+      symptoms.includes("viral") ||
+      symptoms.includes("infection")
+    ) {
+      diseases.push("Viral Infection");
+    }
+
+    if (
+      symptoms.includes("stress") ||
+      symptoms.includes("anxiety")
+    ) {
+      diseases.push("Stress Risk");
+    }
+
+    if (
+      symptoms.includes("fatigue") ||
+      symptoms.includes("weakness")
+    ) {
+      diseases.push("Fatigue");
+    }
+
+    if (
+      (parseInt(formData.weight) < 45 &&
+        parseInt(formData.age) > 40) ||
+
+      symptoms.includes("weight loss") ||
+      symptoms.includes("fatigue") ||
+      symptoms.includes("weakness") ||
+      symptoms.includes("blood") ||
+      symptoms.includes("tumor") ||
+      symptoms.includes("chronic pain")
+    ) {
+      diseases.push("Cancer Risk");
+
+      warnings.push(
+        "Possible Cancer Symptoms Detected"
+      );
+
+      recommendations.push(
+        "Immediate medical screening recommended"
+      );
+
+      risk = "Critical";
+    }
+
+    if (hydration < 40) {
+      diseases.push("Dehydration");
+      recommendations.push("Increase water intake");
+    }
+
+    if (
+      formData.sweat.toLowerCase().includes("excess")
+    ) {
+      diseases.push("Sweat Abnormality");
+    }
+
+    const output = {
+      enteredValues: {
+        BP: formData.bp,
+        Sugar: formData.sugar,
+        HeartRate: formData.heartRate,
+        Oxygen: formData.oxygen,
+        Temperature: formData.temperature,
+        Weight: formData.weight,
+        Age: formData.age,
+        Hydration: formData.hydration,
+        Sweat: formData.sweat,
+        Symptoms: formData.symptoms
+      },
+      diseases,
+      warnings,
+      recommendations,
+      risk,
+      healthScore: calculateHealthScore(),
+      aiAdvice:
+        "Monitor health regularly and consult doctor if symptoms continue."
+    };
+
+    setResult(output);
+
+    setHistory((prev) => [...prev, output]);
+  };
+
+  const cardStyle = {
+    background: darkMode
+      ? "rgba(255,255,255,0.08)"
+      : "#ffffff",
+    padding: "20px",
+    borderRadius: "20px",
+    backdropFilter: "blur(10px)",
+    marginBottom: "20px",
+    color: "white"
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "14px",
+    borderRadius: "12px",
+    border: "2px solid #3b82f6",
+    marginTop: "10px",
+    marginBottom: "15px",
+    fontSize: "18px",
+    backgroundColor: "white",
+    color:"black",
+    WebkitTextFillColor: "black",
+    caretColor: "black",  
+    fontWeight: "bold",
+    outline: "none",
+    boxSizing: "border-box"
+  };
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(to right,#0f172a,#1e293b)",
+        padding: "20px",
+        fontFamily: "Arial"
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          color: "white"
+        }}
+      >
+        <h1>🏥 VitalScan AI</h1>
+
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          style={{
+            padding: "10px",
+            borderRadius: "10px",
+            cursor: "pointer"
+          }}
+        >
+          Toggle Theme
+        </button>
+      </div>
+
+      <div style={cardStyle}>
+        <h2>AI Health Monitoring Dashboard</h2>
+
+        <form onSubmit={handleSubmit}>
+
+          <input
+            type="text"
+            name="bp"
+            placeholder="Blood Pressure"
+            value={formData.bp}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+          <input
+            type="text"
+            name="sugar"
+            placeholder="Sugar Level"
+            value={formData.sugar}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+          <input
+            type="text"
+            name="heartRate"
+            placeholder="Heart Rate"
+            value={formData.heartRate}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+          <input
+            type="text"
+            name="oxygen"
+            placeholder="Oxygen Level"
+            value={formData.oxygen}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+          <input
+            type="text"
+            name="temperature"
+            placeholder="Temperature"
+            value={formData.temperature}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+          <input
+            type="text"
+            name="weight"
+            placeholder="Weight"
+            value={formData.weight}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+          <input
+            type="text"
+            name="age"
+            placeholder="Age"
+            value={formData.age}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+          <input
+            type="text"
+            name="hydration"
+            placeholder="Hydration Level"
+            value={formData.hydration}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+          <input
+            type="text"
+            name="sweat"
+            placeholder="Sweat Analysis"
+            value={formData.sweat}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+          <textarea
+            name="symptoms"
+            placeholder="Enter Symptoms"
+            value={formData.symptoms}
+            onChange={handleChange}
+            style={{
+              ...inputStyle,
+              height: "120px"
+            }}
+          />
+
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              padding: "15px",
+              border: "none",
+              borderRadius: "12px",
+              background:
+                "linear-gradient(to right,#06b6d4,#3b82f6)",
+              color: "black",
+              fontSize: "18px",
+              cursor: "pointer"
+            }}
+          >
+            Run AI Health Analysis
+          </button>
+        </form>
+      </div>
+
+      {result && (
+        <div style={cardStyle}>
+          <h2>🧠 AI Prediction Result</h2>
+
+          <h3>Entered Values:</h3>
+
+          <p>BP: {result?.enteredValues?.BP}</p>
+          <p>Sugar: {result?.enteredValues?.Sugar}</p>
+          <p>Heart Rate: {result?.enteredValues?.HeartRate}</p>
+          <p>Oxygen: {result?.enteredValues?.Oxygen}</p>
+          <p>Temperature: {result?.enteredValues?.Temperature}</p>
+          <p>Hydration: {result?.enteredValues?.Hydration}</p>
+          <p>Sweat: {result?.enteredValues?.Sweat}</p>
+          <p>Symptoms: {result?.enteredValues?.Symptoms}</p>
+
+          <h3>
+            Health Score: {result?.healthScore}/100
+          </h3>
+
+          <h3>Risk Level: {result?.risk}</h3>
+
+          <h3>Detected Diseases:</h3>
+
+          <ul>
+            {result?.diseases?.map((disease, index) => (
+              <li key={index}>{disease}</li>
+            ))}
+          </ul>
+
+          <h3>Warnings:</h3>
+
+          <ul>
+            {result?.warnings?.map((warning, index) => (
+              <li key={index}>{warning}</li>
+            ))}
+          </ul>
+
+          <h3>Recommendations:</h3>
+
+          <ul>
+            {result?.recommendations?.map((rec, index) => (
+              <li key={index}>{rec}</li>
+            ))}
+          </ul>
+
+          <h3>AI Advice:</h3>
+
+          <p>{result?.aiAdvice}</p>
+        </div>
+      )}
+
+      <div style={cardStyle}>
+        <h2>📊 Reports History</h2>
+
+        {history.map((item, index) => (
+          <div
+            key={index}
+            style={{
+              borderBottom: "1px solid gray",
+              padding: "10px"
+            }}
+          >
+            <p>Risk: {item.risk}</p>
+
+            <p>
+              Diseases: {item.diseases.join(", ")}
+            </p>
+
+            <p>
+              Health Score: {item.healthScore}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default App;

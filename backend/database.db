@@ -1,0 +1,39 @@
+// In-Memory Database for VitalAI Backend
+
+const telemetryDatabase = [];
+
+// Save telemetry data
+function saveTelemetry(data) {
+    telemetryDatabase.push({
+        id: telemetryDatabase.length + 1,
+        timestamp: new Date(),
+        telemetry: data
+    });
+}
+
+// Get all telemetry records
+function getAllTelemetry() {
+    return telemetryDatabase;
+}
+
+// Get latest telemetry record
+function getLatestTelemetry() {
+    if (telemetryDatabase.length === 0) {
+        return null;
+    }
+
+    return telemetryDatabase[telemetryDatabase.length - 1];
+}
+
+// Clear database
+function clearDatabase() {
+    telemetryDatabase.length = 0;
+}
+
+// Export functions
+module.exports = {
+    saveTelemetry,
+    getAllTelemetry,
+    getLatestTelemetry,
+    clearDatabase
+};`qq

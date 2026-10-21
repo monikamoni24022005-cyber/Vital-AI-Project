@@ -1,0 +1,14 @@
+{
+  "name": "vitalai-backend",
+  "version": "1.0.0",
+  "description": "VitalAI Health Dashboard Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "user",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
